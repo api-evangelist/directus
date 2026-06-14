@@ -1,0 +1,118 @@
+aid: directus
+name: Directus
+kind: opensource
+description: >-
+  Open-source data platform that wraps any SQL database with a REST and
+  GraphQL API, auto-generated from the schema, plus a no-code admin app
+  for data management. Directus turns any new or existing SQL database
+  (PostgreSQL, MySQL, SQLite, MS SQL, OracleDB, CockroachDB) into an
+  instant REST and GraphQL API with a visual Data Studio for non-technical
+  users. The platform includes policy-based access control, an automation
+  engine (Flows), a built-in AI assistant, digital asset management,
+  real-time WebSockets, and an MCP server for AI agent integration.
+  Deployable as a self-hosted open-source project or as Directus Cloud.
+url: https://raw.githubusercontent.com/api-evangelist/directus/refs/heads/main/apis.yml
+image: https://kinlane-productions2.s3.amazonaws.com/apis-json/apis-json-logo.jpg
+type: Index
+access: Open Source
+position: Consumer
+created: '2026-06-14'
+modified: '2026-06-14'
+specificationVersion: '0.19'
+tags:
+- GraphQL
+- REST API
+- Headless CMS
+- Data Platform
+- Open Source
+- SQL Database
+- No-Code
+- Content Management
+- Real-Time
+- MCP
+apis:
+- aid: directus:rest-api
+  name: Directus REST API
+  description: >-
+    Auto-generated REST API built on top of any SQL database schema.
+    Provides full CRUD operations on all collections, authentication
+    endpoints, file management, user and role management, and system
+    configuration. The API is dynamically generated from the connected
+    database schema and includes filtering, sorting, pagination, and
+    field selection via query parameters.
+  image: https://kinlane-productions2.s3.amazonaws.com/apis-json/apis-json-logo.jpg
+  humanURL: https://directus.com/docs/api
+  tags:
+  - REST
+  - CRUD
+  - Collections
+  - Authentication
+  - Files
+  properties:
+  - type: Documentation
+    url: https://directus.com/docs/api
+  - type: Reference
+    url: https://directus.com/docs/api/items
+  - type: Authentication
+    url: https://directus.com/docs/auth
+- aid: directus:graphql-api
+  name: Directus GraphQL API
+  description: >-
+    Auto-generated GraphQL API that mirrors the REST API surface,
+    providing strongly-typed queries and mutations for all collections
+    and system endpoints. Supports nested relational queries, filtering,
+    sorting, aggregation, and subscriptions via WebSockets. The schema
+    is dynamically generated from the connected SQL database.
+  image: https://kinlane-productions2.s3.amazonaws.com/apis-json/apis-json-logo.jpg
+  humanURL: https://directus.com/docs/graphql
+  tags:
+  - GraphQL
+  - Queries
+  - Mutations
+  - Subscriptions
+  - Real-Time
+  properties:
+  - type: Documentation
+    url: https://directus.com/docs/graphql
+  - type: GraphQL
+    url: graphql/directus-graphql.md
+common:
+- type: Website
+  url: https://directus.com/
+- type: Documentation
+  url: https://directus.com/docs
+- type: LinkedIn
+  url: https://www.linkedin.com/company/directus-io
+- type: GitHubOrganization
+  url: https://github.com/directus
+- type: GitHubRepository
+  url: https://github.com/directus/directus
+- type: Blog
+  url: https://directus.com/blog
+- type: Pricing
+  url: https://directus.com/pricing
+- type: Plans
+  url: plans/directus-plans.md
+- type: RateLimits
+  url: rate-limits/directus-rate-limits.md
+- type: FinOps
+  url: finops/directus-finops.md
+- type: GettingStarted
+  url: https://directus.com/docs/getting-started
+- type: APIReference
+  url: https://directus.com/docs/api
+- type: Community
+  url: https://community.directus.io
+- type: Discord
+  url: https://discord.com/invite/directus
+- type: YouTube
+  url: https://www.youtube.com/@DirectusVideos
+- type: Twitter
+  url: https://twitter.com/directus
+- type: License
+  url: https://github.com/directus/directus/blob/main/license
+- type: Sandbox
+  url: https://sandbox.directus.io
+maintainers:
+- FN: Kin Lane
+  email: kin@apievangelist.com
