@@ -76,6 +76,8 @@ apis:
     url: https://directus.com/docs/graphql
   - type: GraphQL
     url: graphql/directus-graphql.md
+  - type: GraphQLSchema
+    url: graphql/directus-schema.graphql
 common:
 - type: Website
   url: https://directus.com/

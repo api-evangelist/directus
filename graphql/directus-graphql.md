@@ -31,8 +31,13 @@ Tokens are obtained via the `/auth/login` REST endpoint or the `auth_login` muta
 
 Directus GraphQL supports a rich filter object using logical operators (`_and`, `_or`) and field-level comparisons (`_eq`, `_neq`, `_lt`, `_lte`, `_gt`, `_gte`, `_in`, `_nin`, `_contains`, `_starts_with`, `_ends_with`, etc.).
 
+## Schema
+
+A full SDL schema covering all system types, queries, mutations, subscriptions, filter operators, aggregations, and input types is available in [directus-schema.graphql](directus-schema.graphql). It was derived from the Directus open-source codebase at `api/src/services/graphql/`.
+
 ## References
 
 - Documentation: https://directus.com/docs/graphql
 - API Reference: https://directus.com/docs/api
 - GitHub Repository: https://github.com/directus/directus
+- Schema Source: https://github.com/directus/directus/tree/main/api/src/services/graphql

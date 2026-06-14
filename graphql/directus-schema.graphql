@@ -1,0 +1,2340 @@
+# Directus GraphQL Schema (SDL)
+# Derived from the Directus open-source codebase: https://github.com/directus/directus
+# Source files: api/src/services/graphql/
+#
+# TWO endpoints are exposed:
+#   /graphql        — user-space (dynamic collections defined by the project)
+#   /graphql/system — built-in system collections listed below
+#
+# The user-space schema is fully dynamic: every SQL collection becomes a type
+# automatically, so only the pattern is shown here.  The system schema is fixed
+# and documented in full.
+
+# ---------------------------------------------------------------------------
+# Custom Scalars
+# ---------------------------------------------------------------------------
+
+"""ISO 8601 date string (YYYY-MM-DD)."""
+scalar Date
+
+"""ISO 8601 date-time string."""
+scalar DateTime
+
+"""A JSON value (object, array, string, number, boolean, or null)."""
+scalar JSON
+
+"""A 64-bit integer serialised as a string."""
+scalar BigInt
+
+"""A bcrypt / argon2 hash string. Write-only; never returned in reads."""
+scalar Hash
+
+"""A GeoJSON value."""
+scalar GeoJSON
+
+"""A value that may be either a String or a Float (used in filter args)."""
+scalar StringOrFloat
+
+"""Void — mutations that return no meaningful value."""
+scalar Void
+
+# ---------------------------------------------------------------------------
+# Enums
+# ---------------------------------------------------------------------------
+
+"""Authentication response mode."""
+enum auth_mode {
+  """Tokens are returned in the JSON response body."""
+  json
+  """Tokens are set as HTTP-only cookies."""
+  cookie
+  """A single session cookie is used."""
+  session
+}
+
+"""Subscription event type filter."""
+enum EventEnum {
+  create
+  update
+  delete
+}
+
+"""Scope for the SDL introspection query."""
+enum graphql_sdl_scope {
+  items
+  system
+}
+
+# ---------------------------------------------------------------------------
+# Common output types
+# ---------------------------------------------------------------------------
+
+"""Return type for bulk-delete mutations."""
+type delete_many {
+  ids: [ID]!
+}
+
+"""Return type for single-item delete mutations."""
+type delete_one {
+  id: ID!
+}
+
+# ---------------------------------------------------------------------------
+# Date/time function types (virtual fields on date/time columns)
+# ---------------------------------------------------------------------------
+
+type date_functions {
+  year: Int
+  month: Int
+  week: Int
+  day: Int
+  weekday: Int
+}
+
+type time_functions {
+  hour: Int
+  minute: Int
+  second: Int
+}
+
+type datetime_functions {
+  year: Int
+  month: Int
+  week: Int
+  day: Int
+  weekday: Int
+  hour: Int
+  minute: Int
+  second: Int
+}
+
+type count_functions {
+  count: Int
+}
+
+# ---------------------------------------------------------------------------
+# Filter operator input types
+# ---------------------------------------------------------------------------
+
+input id_filter_operators {
+  _eq: ID
+  _neq: ID
+  _contains: ID
+  _icontains: ID
+  _ncontains: ID
+  _starts_with: ID
+  _nstarts_with: ID
+  _istarts_with: ID
+  _nistarts_with: ID
+  _ends_with: ID
+  _nends_with: ID
+  _iends_with: ID
+  _niends_with: ID
+  _in: [ID]
+  _nin: [ID]
+  _null: Boolean
+  _nnull: Boolean
+  _empty: Boolean
+  _nempty: Boolean
+}
+
+input string_filter_operators {
+  _eq: String
+  _neq: String
+  _contains: String
+  _icontains: String
+  _ncontains: String
+  _starts_with: String
+  _nstarts_with: String
+  _istarts_with: String
+  _nistarts_with: String
+  _ends_with: String
+  _nends_with: String
+  _iends_with: String
+  _niends_with: String
+  _in: [String]
+  _nin: [String]
+  _null: Boolean
+  _nnull: Boolean
+  _empty: Boolean
+  _nempty: Boolean
+}
+
+input boolean_filter_operators {
+  _eq: Boolean
+  _neq: Boolean
+  _null: Boolean
+  _nnull: Boolean
+}
+
+input number_filter_operators {
+  _eq: StringOrFloat
+  _neq: StringOrFloat
+  _in: [StringOrFloat]
+  _nin: [StringOrFloat]
+  _gt: StringOrFloat
+  _gte: StringOrFloat
+  _lt: StringOrFloat
+  _lte: StringOrFloat
+  _null: Boolean
+  _nnull: Boolean
+  _between: [StringOrFloat]
+  _nbetween: [StringOrFloat]
+}
+
+input big_int_filter_operators {
+  _eq: BigInt
+  _neq: BigInt
+  _in: [BigInt]
+  _nin: [BigInt]
+  _gt: BigInt
+  _gte: BigInt
+  _lt: BigInt
+  _lte: BigInt
+  _null: Boolean
+  _nnull: Boolean
+  _between: [BigInt]
+  _nbetween: [BigInt]
+}
+
+input date_filter_operators {
+  _eq: String
+  _neq: String
+  _gt: String
+  _gte: String
+  _lt: String
+  _lte: String
+  _null: Boolean
+  _nnull: Boolean
+  _in: [String]
+  _nin: [String]
+  _between: [StringOrFloat]
+  _nbetween: [StringOrFloat]
+}
+
+input geometry_filter_operators {
+  _eq: GeoJSON
+  _neq: GeoJSON
+  _intersects: GeoJSON
+  _nintersects: GeoJSON
+  _intersects_bbox: GeoJSON
+  _nintersects_bbox: GeoJSON
+  _null: Boolean
+  _nnull: Boolean
+}
+
+input hash_filter_operators {
+  _null: Boolean
+  _nnull: Boolean
+  _empty: Boolean
+  _nempty: Boolean
+}
+
+input json_filter_operators {
+  _json: JSON
+  _null: Boolean
+  _nnull: Boolean
+}
+
+input count_function_filter_operators {
+  count: number_filter_operators
+}
+
+input date_function_filter_operators {
+  year: number_filter_operators
+  month: number_filter_operators
+  week: number_filter_operators
+  day: number_filter_operators
+  weekday: number_filter_operators
+}
+
+input time_function_filter_operators {
+  hour: number_filter_operators
+  minute: number_filter_operators
+  second: number_filter_operators
+}
+
+input datetime_function_filter_operators {
+  year: number_filter_operators
+  month: number_filter_operators
+  week: number_filter_operators
+  day: number_filter_operators
+  weekday: number_filter_operators
+  hour: number_filter_operators
+  minute: number_filter_operators
+  second: number_filter_operators
+}
+
+# ---------------------------------------------------------------------------
+# Auth types
+# ---------------------------------------------------------------------------
+
+type auth_tokens {
+  access_token: String
+  expires: BigInt
+  refresh_token: String
+}
+
+type users_me_tfa_generate_data {
+  secret: String
+  otpauth_url: String
+}
+
+# ---------------------------------------------------------------------------
+# Server info types
+# ---------------------------------------------------------------------------
+
+type server_info_project {
+  project_name: String
+  project_descriptor: String
+  project_logo: String
+  project_color: String
+  default_language: String
+  public_foreground: String
+  public_background: String
+  public_note: String
+  custom_css: String
+  public_registration: Boolean
+  public_registration_verify_email: Boolean
+}
+
+type server_info_license_entitlements {
+  production_enabled: Boolean!
+  ai_translations_enabled: Boolean!
+  display_powered_by: String!
+}
+
+type server_info_license {
+  source: String
+  entitlements: server_info_license_entitlements
+}
+
+type server_info_rate_limit {
+  points: Int
+  duration: Int
+}
+
+type server_info_websocket_rest {
+  authentication: String
+  path: String
+}
+
+type server_info_websocket_graphql {
+  authentication: String
+  path: String
+}
+
+type server_info_websocket {
+  rest: server_info_websocket_rest
+  graphql: server_info_websocket_graphql
+  heartbeat: Int
+}
+
+type server_info_query_limit {
+  default: Int
+  max: Int
+}
+
+type server_info {
+  project: server_info_project
+  license: server_info_license
+  rateLimit: server_info_rate_limit
+  rateLimitGlobal: server_info_rate_limit
+  websocket: server_info_websocket
+  queryLimit: server_info_query_limit
+}
+
+# ---------------------------------------------------------------------------
+# System collection types — /graphql/system
+# ---------------------------------------------------------------------------
+
+"""A Directus user account."""
+type directus_users {
+  id: ID!
+  first_name: String
+  last_name: String
+  email: String
+  password: Hash
+  location: String
+  title: String
+  description: String
+  tags: JSON
+  avatar: directus_files
+  language: String
+  tfa_secret: Hash
+  status: String
+  role: directus_roles
+  token: Hash
+  last_access: DateTime
+  last_page: String
+  provider: String
+  external_identifier: String
+  auth_data: JSON
+  email_notifications: Boolean
+  appearance: String
+  theme_dark: String
+  theme_light: String
+  theme_light_overrides: JSON
+  theme_dark_overrides: JSON
+  policies: [directus_access]
+}
+
+"""A file uploaded to Directus."""
+type directus_files {
+  id: ID!
+  storage: String!
+  filename_disk: String
+  filename_download: String!
+  title: String
+  type: String
+  folder: directus_folders
+  uploaded_by: directus_users
+  created_on: DateTime
+  modified_by: directus_users
+  modified_on: DateTime
+  charset: String
+  filesize: BigInt
+  width: Int
+  height: Int
+  duration: Int
+  embed: String
+  description: String
+  location: String
+  tags: JSON
+  metadata: JSON
+  focal_point_x: Int
+  focal_point_y: Int
+  tus_id: String
+  tus_data: JSON
+  uploaded_on: DateTime
+}
+
+"""A file storage folder."""
+type directus_folders {
+  id: ID!
+  name: String!
+  parent: directus_folders
+}
+
+"""A Directus role."""
+type directus_roles {
+  id: ID!
+  name: String!
+  icon: String
+  description: String
+  parent: directus_roles
+  children: [directus_roles]
+  users: [directus_users]
+  policies: [directus_access]
+}
+
+"""An access control policy."""
+type directus_policies {
+  id: ID!
+  name: String!
+  icon: String
+  description: String
+  ip_access: JSON
+  enforce_tfa: Boolean!
+  admin_access: Boolean!
+  app_access: Boolean!
+  permissions: [directus_permissions]
+  roles: [directus_access]
+  users: [directus_access]
+}
+
+"""A role-to-policy or user-to-policy binding."""
+type directus_access {
+  id: ID!
+  role: directus_roles
+  user: directus_users
+  policy: directus_policies!
+  sort: Int
+}
+
+"""A permission rule."""
+type directus_permissions {
+  id: ID
+  collection: String!
+  action: String!
+  permissions: JSON
+  validation: JSON
+  presets: JSON
+  fields: JSON
+  policy: directus_policies
+}
+
+"""A schema activity event."""
+type directus_activity {
+  id: ID!
+  action: String!
+  user: directus_users
+  timestamp: DateTime!
+  ip: String
+  user_agent: String
+  collection: String!
+  item: String!
+  comment: String
+  origin: String
+  revisions: [directus_revisions]
+}
+
+"""A data revision snapshot."""
+type directus_revisions {
+  id: ID!
+  activity: directus_activity!
+  collection: String!
+  item: String!
+  data: JSON
+  delta: JSON
+  parent: directus_revisions
+  version: directus_versions
+}
+
+"""A saved filter preset."""
+type directus_presets {
+  id: ID!
+  bookmark: String
+  user: directus_users
+  role: directus_roles
+  collection: String
+  search: String
+  layout: String
+  layout_query: JSON
+  layout_options: JSON
+  refresh_interval: Int
+  filter: JSON
+  icon: String
+  color: String
+}
+
+"""A translation string."""
+type directus_translations {
+  id: ID!
+  language: String!
+  key: String!
+  value: String!
+}
+
+"""An analytics dashboard."""
+type directus_dashboards {
+  id: ID!
+  name: String!
+  icon: String
+  note: String
+  date_created: DateTime
+  user_created: directus_users
+  color: String
+  panels: [directus_panels]
+}
+
+"""A panel on an analytics dashboard."""
+type directus_panels {
+  id: ID!
+  dashboard: directus_dashboards!
+  name: String
+  icon: String
+  color: String
+  show_header: Boolean!
+  note: String
+  type: String!
+  position_x: Int!
+  position_y: Int!
+  width: Int!
+  height: Int!
+  options: JSON
+  date_created: DateTime
+  user_created: directus_users
+}
+
+"""An in-app notification."""
+type directus_notifications {
+  id: ID!
+  timestamp: DateTime
+  status: String
+  recipient: directus_users!
+  sender: directus_users
+  subject: String!
+  message: String
+  collection: String
+  item: String
+}
+
+"""An automation flow definition."""
+type directus_flows {
+  id: ID!
+  name: String!
+  icon: String
+  color: String
+  description: String
+  status: String!
+  trigger: String
+  accountability: String
+  options: JSON
+  operation: directus_operations
+  date_created: DateTime
+  user_created: directus_users
+  operations: [directus_operations]
+}
+
+"""An operation step inside a flow."""
+type directus_operations {
+  id: ID!
+  name: String
+  key: String!
+  type: String!
+  position_x: Int!
+  position_y: Int!
+  options: JSON
+  resolve: directus_operations
+  reject: directus_operations
+  flow: directus_flows!
+  date_created: DateTime
+  user_created: directus_users
+}
+
+"""A shared item link."""
+type directus_shares {
+  id: ID!
+  name: String
+  collection: String
+  item: String
+  role: directus_roles
+  password: Hash
+  user_created: directus_users
+  date_created: DateTime
+  date_start: DateTime
+  date_end: DateTime
+  times_used: Int
+  max_uses: Int
+}
+
+"""A content version."""
+type directus_versions {
+  id: ID!
+  key: String!
+  name: String
+  collection: String!
+  item: String
+  hash: String
+  date_created: DateTime
+  date_updated: DateTime
+  user_created: directus_users
+  user_updated: directus_users
+}
+
+# ---------------------------------------------------------------------------
+# Schema-introspection types (admin only, /graphql/system)
+# ---------------------------------------------------------------------------
+
+type directus_collections_meta {
+  collection: String
+  icon: String
+  note: String
+  display_template: String
+  hidden: Boolean
+  singleton: Boolean
+  translations: JSON
+  archive_field: String
+  archive_app_filter: Boolean
+  archive_value: String
+  unarchive_value: String
+  sort_field: String
+  accountability: String
+  color: String
+  item_duplication_fields: JSON
+  sort: Int
+  group: String
+  collapse: String
+  preview_url: String
+  versioning: Boolean
+}
+
+type directus_collections_schema {
+  name: String
+  comment: String
+}
+
+type directus_collections {
+  collection: String
+  meta: directus_collections_meta
+  schema: directus_collections_schema
+}
+
+type directus_fields {
+  id: ID
+  collection: String
+  field: String
+  type: String
+  meta: JSON
+  schema: JSON
+}
+
+type directus_relations {
+  collection: String
+  field: String
+  related_collection: String
+  meta: JSON
+  schema: JSON
+}
+
+type directus_extensions_schema {
+  type: String
+  local: Boolean
+}
+
+type directus_extensions_meta {
+  enabled: Boolean
+}
+
+type directus_extensions {
+  bundle: String
+  name: String!
+  schema: directus_extensions_schema
+  meta: directus_extensions_meta
+}
+
+type delete_collection {
+  collection: String
+}
+
+type delete_field {
+  collection: String
+  field: String
+}
+
+type delete_relation {
+  collection: String
+  field: String
+}
+
+type policy_me_globals_type {
+  enforce_tfa: Boolean
+  app_access: Boolean
+  admin_access: Boolean
+}
+
+# ---------------------------------------------------------------------------
+# Input types for system collection mutations
+# ---------------------------------------------------------------------------
+
+input create_directus_users_input {
+  id: ID
+  first_name: String
+  last_name: String
+  email: String
+  password: Hash
+  location: String
+  title: String
+  description: String
+  tags: JSON
+  avatar: ID
+  language: String
+  status: String
+  role: ID
+  token: String
+  provider: String
+  external_identifier: String
+  auth_data: JSON
+  email_notifications: Boolean
+  appearance: String
+  theme_dark: String
+  theme_light: String
+  theme_light_overrides: JSON
+  theme_dark_overrides: JSON
+}
+
+input update_directus_users_input {
+  first_name: String
+  last_name: String
+  email: String
+  password: Hash
+  location: String
+  title: String
+  description: String
+  tags: JSON
+  avatar: ID
+  language: String
+  status: String
+  role: ID
+  token: String
+  provider: String
+  external_identifier: String
+  auth_data: JSON
+  email_notifications: Boolean
+  appearance: String
+  theme_dark: String
+  theme_light: String
+  theme_light_overrides: JSON
+  theme_dark_overrides: JSON
+}
+
+input create_directus_files_input {
+  id: ID
+  storage: String
+  filename_disk: String
+  filename_download: String
+  title: String
+  type: String
+  folder: ID
+  uploaded_by: ID
+  charset: String
+  description: String
+  location: String
+  tags: JSON
+  metadata: JSON
+  focal_point_x: Int
+  focal_point_y: Int
+}
+
+input update_directus_files_input {
+  storage: String
+  filename_disk: String
+  filename_download: String
+  title: String
+  type: String
+  folder: ID
+  charset: String
+  description: String
+  location: String
+  tags: JSON
+  metadata: JSON
+  focal_point_x: Int
+  focal_point_y: Int
+}
+
+input create_directus_folders_input {
+  id: ID
+  name: String!
+  parent: ID
+}
+
+input update_directus_folders_input {
+  name: String
+  parent: ID
+}
+
+input create_directus_roles_input {
+  id: ID
+  name: String!
+  icon: String
+  description: String
+  parent: ID
+}
+
+input update_directus_roles_input {
+  name: String
+  icon: String
+  description: String
+  parent: ID
+}
+
+input create_directus_policies_input {
+  id: ID
+  name: String!
+  icon: String
+  description: String
+  ip_access: JSON
+  enforce_tfa: Boolean
+  admin_access: Boolean
+  app_access: Boolean
+}
+
+input update_directus_policies_input {
+  name: String
+  icon: String
+  description: String
+  ip_access: JSON
+  enforce_tfa: Boolean
+  admin_access: Boolean
+  app_access: Boolean
+}
+
+input create_directus_permissions_input {
+  collection: String!
+  action: String!
+  permissions: JSON
+  validation: JSON
+  presets: JSON
+  fields: JSON
+  policy: ID
+}
+
+input update_directus_permissions_input {
+  permissions: JSON
+  validation: JSON
+  presets: JSON
+  fields: JSON
+  policy: ID
+}
+
+input create_directus_presets_input {
+  id: ID
+  bookmark: String
+  user: ID
+  role: ID
+  collection: String
+  search: String
+  layout: String
+  layout_query: JSON
+  layout_options: JSON
+  refresh_interval: Int
+  filter: JSON
+  icon: String
+  color: String
+}
+
+input update_directus_presets_input {
+  bookmark: String
+  user: ID
+  role: ID
+  collection: String
+  search: String
+  layout: String
+  layout_query: JSON
+  layout_options: JSON
+  refresh_interval: Int
+  filter: JSON
+  icon: String
+  color: String
+}
+
+input create_directus_translations_input {
+  id: ID
+  language: String!
+  key: String!
+  value: String!
+}
+
+input update_directus_translations_input {
+  language: String
+  key: String
+  value: String
+}
+
+input create_directus_dashboards_input {
+  id: ID
+  name: String!
+  icon: String
+  note: String
+  color: String
+}
+
+input update_directus_dashboards_input {
+  name: String
+  icon: String
+  note: String
+  color: String
+}
+
+input create_directus_panels_input {
+  id: ID
+  dashboard: ID!
+  name: String
+  icon: String
+  color: String
+  show_header: Boolean
+  note: String
+  type: String!
+  position_x: Int!
+  position_y: Int!
+  width: Int!
+  height: Int!
+  options: JSON
+}
+
+input update_directus_panels_input {
+  dashboard: ID
+  name: String
+  icon: String
+  color: String
+  show_header: Boolean
+  note: String
+  type: String
+  position_x: Int
+  position_y: Int
+  width: Int
+  height: Int
+  options: JSON
+}
+
+input create_directus_notifications_input {
+  id: ID
+  timestamp: DateTime
+  status: String
+  recipient: ID!
+  sender: ID
+  subject: String!
+  message: String
+  collection: String
+  item: String
+}
+
+input update_directus_notifications_input {
+  status: String
+  subject: String
+  message: String
+}
+
+input create_directus_flows_input {
+  id: ID
+  name: String!
+  icon: String
+  color: String
+  description: String
+  status: String
+  trigger: String
+  accountability: String
+  options: JSON
+  operation: ID
+}
+
+input update_directus_flows_input {
+  name: String
+  icon: String
+  color: String
+  description: String
+  status: String
+  trigger: String
+  accountability: String
+  options: JSON
+  operation: ID
+}
+
+input create_directus_operations_input {
+  id: ID
+  name: String
+  key: String!
+  type: String!
+  position_x: Int!
+  position_y: Int!
+  options: JSON
+  resolve: ID
+  reject: ID
+  flow: ID!
+}
+
+input update_directus_operations_input {
+  name: String
+  key: String
+  type: String
+  position_x: Int
+  position_y: Int
+  options: JSON
+  resolve: ID
+  reject: ID
+  flow: ID
+}
+
+input create_directus_shares_input {
+  id: ID
+  name: String
+  collection: String
+  item: String
+  role: ID
+  password: String
+  date_start: DateTime
+  date_end: DateTime
+  max_uses: Int
+}
+
+input update_directus_shares_input {
+  name: String
+  role: ID
+  password: String
+  date_start: DateTime
+  date_end: DateTime
+  max_uses: Int
+}
+
+input create_directus_versions_input {
+  id: ID
+  key: String!
+  name: String
+  collection: String!
+  item: String
+}
+
+input update_directus_versions_input {
+  key: String
+  name: String
+}
+
+# Admin-only schema mutation inputs
+input create_collections_input {
+  collection: String!
+  meta: JSON
+  schema: JSON
+  fields: [create_fields_input!]
+}
+
+input update_collections_input {
+  meta: JSON
+}
+
+input create_fields_input {
+  collection: String
+  field: String!
+  type: String
+  meta: JSON
+  schema: JSON
+}
+
+input update_fields_input {
+  field: String
+  type: String
+  meta: JSON
+  schema: JSON
+}
+
+input create_relations_input {
+  collection: String!
+  field: String!
+  related_collection: String
+  meta: JSON
+  schema: JSON
+}
+
+input update_relations_input {
+  collection: String
+  field: String
+  related_collection: String
+  meta: JSON
+  schema: JSON
+}
+
+# ---------------------------------------------------------------------------
+# Root Query type — /graphql/system
+# ---------------------------------------------------------------------------
+
+"""
+System-scope Query type. Available at /graphql/system.
+User-space /graphql exposes the same query patterns for custom collections
+(e.g. articles, products) generated from the connected SQL database schema.
+"""
+type Query {
+  # ---- Server ----
+  """Ping the server. Returns 'pong'."""
+  server_ping: String
+
+  """General server information."""
+  server_info: server_info
+
+  """Server health status (JSON object)."""
+  server_health: JSON
+
+  """OpenAPI 3 specification (JSON)."""
+  server_specs_oas: JSON
+
+  """GraphQL SDL for the given scope."""
+  server_specs_graphql(scope: graphql_sdl_scope): String
+
+  # ---- Users ----
+  """List all users."""
+  users(
+    filter: directus_users_filter
+    sort: [String]
+    limit: Int
+    offset: Int
+    page: Int
+    search: String
+  ): [directus_users]
+
+  """Read a user by primary key."""
+  users_by_id(id: ID!): directus_users
+
+  """The currently authenticated user."""
+  users_me: directus_users
+
+  """Aggregate users."""
+  users_aggregated(
+    groupBy: [String]
+    filter: directus_users_filter
+    limit: Int
+    offset: Int
+    page: Int
+    search: String
+    sort: [String]
+  ): [directus_users_aggregated]
+
+  # ---- Roles ----
+  roles(
+    filter: directus_roles_filter
+    sort: [String]
+    limit: Int
+    offset: Int
+    page: Int
+    search: String
+  ): [directus_roles]
+
+  roles_by_id(id: ID!): directus_roles
+
+  """Roles assigned to the current user."""
+  roles_me: [directus_roles]
+
+  roles_aggregated(
+    groupBy: [String]
+    filter: directus_roles_filter
+    limit: Int
+    offset: Int
+    page: Int
+    search: String
+    sort: [String]
+  ): [directus_roles_aggregated]
+
+  # ---- Policies ----
+  policies(
+    filter: directus_policies_filter
+    sort: [String]
+    limit: Int
+    offset: Int
+    page: Int
+    search: String
+  ): [directus_policies]
+
+  policies_by_id(id: ID!): directus_policies
+
+  """Policy globals for the current user."""
+  policies_me_globals: policy_me_globals_type
+
+  policies_aggregated(
+    groupBy: [String]
+    filter: directus_policies_filter
+    limit: Int
+    offset: Int
+    page: Int
+    search: String
+    sort: [String]
+  ): [directus_policies_aggregated]
+
+  # ---- Access ----
+  access(
+    filter: directus_access_filter
+    sort: [String]
+    limit: Int
+    offset: Int
+    page: Int
+    search: String
+  ): [directus_access]
+
+  access_by_id(id: ID!): directus_access
+
+  access_aggregated(
+    groupBy: [String]
+    filter: directus_access_filter
+    limit: Int
+    offset: Int
+    page: Int
+    search: String
+    sort: [String]
+  ): [directus_access_aggregated]
+
+  # ---- Permissions ----
+  permissions(
+    filter: directus_permissions_filter
+    sort: [String]
+    limit: Int
+    offset: Int
+    page: Int
+    search: String
+  ): [directus_permissions]
+
+  permissions_by_id(id: ID!): directus_permissions
+
+  """Effective permissions for the current user, keyed by collection."""
+  permissions_me: JSON
+
+  permissions_aggregated(
+    groupBy: [String]
+    filter: directus_permissions_filter
+    limit: Int
+    offset: Int
+    page: Int
+    search: String
+    sort: [String]
+  ): [directus_permissions_aggregated]
+
+  # ---- Files ----
+  files(
+    filter: directus_files_filter
+    sort: [String]
+    limit: Int
+    offset: Int
+    page: Int
+    search: String
+  ): [directus_files]
+
+  files_by_id(id: ID!): directus_files
+
+  files_aggregated(
+    groupBy: [String]
+    filter: directus_files_filter
+    limit: Int
+    offset: Int
+    page: Int
+    search: String
+    sort: [String]
+  ): [directus_files_aggregated]
+
+  # ---- Folders ----
+  folders(
+    filter: directus_folders_filter
+    sort: [String]
+    limit: Int
+    offset: Int
+    page: Int
+    search: String
+  ): [directus_folders]
+
+  folders_by_id(id: ID!): directus_folders
+
+  folders_aggregated(
+    groupBy: [String]
+    filter: directus_folders_filter
+    limit: Int
+    offset: Int
+    page: Int
+    search: String
+    sort: [String]
+  ): [directus_folders_aggregated]
+
+  # ---- Activity ----
+  activity(
+    filter: directus_activity_filter
+    sort: [String]
+    limit: Int
+    offset: Int
+    page: Int
+    search: String
+  ): [directus_activity]
+
+  activity_by_id(id: ID!): directus_activity
+
+  activity_aggregated(
+    groupBy: [String]
+    filter: directus_activity_filter
+    limit: Int
+    offset: Int
+    page: Int
+    search: String
+    sort: [String]
+  ): [directus_activity_aggregated]
+
+  # ---- Revisions ----
+  revisions(
+    filter: directus_revisions_filter
+    sort: [String]
+    limit: Int
+    offset: Int
+    page: Int
+    search: String
+  ): [directus_revisions]
+
+  revisions_by_id(id: ID!): directus_revisions
+
+  revisions_aggregated(
+    groupBy: [String]
+    filter: directus_revisions_filter
+    limit: Int
+    offset: Int
+    page: Int
+    search: String
+    sort: [String]
+  ): [directus_revisions_aggregated]
+
+  # ---- Presets ----
+  presets(
+    filter: directus_presets_filter
+    sort: [String]
+    limit: Int
+    offset: Int
+    page: Int
+    search: String
+  ): [directus_presets]
+
+  presets_by_id(id: ID!): directus_presets
+
+  presets_aggregated(
+    groupBy: [String]
+    filter: directus_presets_filter
+    limit: Int
+    offset: Int
+    page: Int
+    search: String
+    sort: [String]
+  ): [directus_presets_aggregated]
+
+  # ---- Translations ----
+  translations(
+    filter: directus_translations_filter
+    sort: [String]
+    limit: Int
+    offset: Int
+    page: Int
+    search: String
+  ): [directus_translations]
+
+  translations_by_id(id: ID!): directus_translations
+
+  translations_aggregated(
+    groupBy: [String]
+    filter: directus_translations_filter
+    limit: Int
+    offset: Int
+    page: Int
+    search: String
+    sort: [String]
+  ): [directus_translations_aggregated]
+
+  # ---- Dashboards ----
+  dashboards(
+    filter: directus_dashboards_filter
+    sort: [String]
+    limit: Int
+    offset: Int
+    page: Int
+    search: String
+  ): [directus_dashboards]
+
+  dashboards_by_id(id: ID!): directus_dashboards
+
+  dashboards_aggregated(
+    groupBy: [String]
+    filter: directus_dashboards_filter
+    limit: Int
+    offset: Int
+    page: Int
+    search: String
+    sort: [String]
+  ): [directus_dashboards_aggregated]
+
+  # ---- Panels ----
+  panels(
+    filter: directus_panels_filter
+    sort: [String]
+    limit: Int
+    offset: Int
+    page: Int
+    search: String
+  ): [directus_panels]
+
+  panels_by_id(id: ID!): directus_panels
+
+  panels_aggregated(
+    groupBy: [String]
+    filter: directus_panels_filter
+    limit: Int
+    offset: Int
+    page: Int
+    search: String
+    sort: [String]
+  ): [directus_panels_aggregated]
+
+  # ---- Notifications ----
+  notifications(
+    filter: directus_notifications_filter
+    sort: [String]
+    limit: Int
+    offset: Int
+    page: Int
+    search: String
+  ): [directus_notifications]
+
+  notifications_by_id(id: ID!): directus_notifications
+
+  notifications_aggregated(
+    groupBy: [String]
+    filter: directus_notifications_filter
+    limit: Int
+    offset: Int
+    page: Int
+    search: String
+    sort: [String]
+  ): [directus_notifications_aggregated]
+
+  # ---- Flows ----
+  flows(
+    filter: directus_flows_filter
+    sort: [String]
+    limit: Int
+    offset: Int
+    page: Int
+    search: String
+  ): [directus_flows]
+
+  flows_by_id(id: ID!): directus_flows
+
+  flows_aggregated(
+    groupBy: [String]
+    filter: directus_flows_filter
+    limit: Int
+    offset: Int
+    page: Int
+    search: String
+    sort: [String]
+  ): [directus_flows_aggregated]
+
+  # ---- Operations ----
+  operations(
+    filter: directus_operations_filter
+    sort: [String]
+    limit: Int
+    offset: Int
+    page: Int
+    search: String
+  ): [directus_operations]
+
+  operations_by_id(id: ID!): directus_operations
+
+  operations_aggregated(
+    groupBy: [String]
+    filter: directus_operations_filter
+    limit: Int
+    offset: Int
+    page: Int
+    search: String
+    sort: [String]
+  ): [directus_operations_aggregated]
+
+  # ---- Shares ----
+  shares(
+    filter: directus_shares_filter
+    sort: [String]
+    limit: Int
+    offset: Int
+    page: Int
+    search: String
+  ): [directus_shares]
+
+  shares_by_id(id: ID!): directus_shares
+
+  shares_aggregated(
+    groupBy: [String]
+    filter: directus_shares_filter
+    limit: Int
+    offset: Int
+    page: Int
+    search: String
+    sort: [String]
+  ): [directus_shares_aggregated]
+
+  # ---- Versions ----
+  versions(
+    filter: directus_versions_filter
+    sort: [String]
+    limit: Int
+    offset: Int
+    page: Int
+    search: String
+  ): [directus_versions]
+
+  versions_by_id(id: ID!): directus_versions
+
+  versions_aggregated(
+    groupBy: [String]
+    filter: directus_versions_filter
+    limit: Int
+    offset: Int
+    page: Int
+    search: String
+    sort: [String]
+  ): [directus_versions_aggregated]
+
+  # ---- Schema (admin only) ----
+  """List all collections (admin only)."""
+  collections: [directus_collections]!
+
+  """Read a collection by name (admin only)."""
+  collections_by_name(name: String!): directus_collections
+
+  """List all fields (admin only)."""
+  fields: [directus_fields]!
+
+  """List fields for a specific collection (admin only)."""
+  fields_in_collection(collection: String!): [directus_fields]!
+
+  """Read a specific field (admin only)."""
+  fields_by_name(collection: String!, field: String!): directus_fields
+
+  """List all relations (admin only)."""
+  relations: [directus_relations]!
+
+  """List relations for a specific collection (admin only)."""
+  relations_in_collection(collection: String!): [directus_relations]!
+
+  """Read a specific relation (admin only)."""
+  relations_by_name(collection: String!, field: String!): directus_relations
+
+  """List all installed extensions (admin only)."""
+  extensions: [directus_extensions]!
+}
+
+# ---------------------------------------------------------------------------
+# Root Mutation type
+# ---------------------------------------------------------------------------
+
+type Mutation {
+  # ---- Auth ----
+  """Authenticate with email + password. Returns tokens."""
+  auth_login(
+    email: String!
+    password: String!
+    mode: auth_mode
+    otp: String
+  ): auth_tokens
+
+  """Refresh an access token."""
+  auth_refresh(
+    refresh_token: String
+    mode: auth_mode
+  ): auth_tokens
+
+  """Invalidate a refresh token / session."""
+  auth_logout(
+    refresh_token: String
+    mode: auth_mode
+  ): Boolean
+
+  """Request a password-reset email."""
+  auth_password_request(email: String!, reset_url: String): Boolean
+
+  """Complete a password reset using the emailed token."""
+  auth_password_reset(token: String!, password: String!): Boolean
+
+  # ---- Current user ----
+  """Update the currently authenticated user's profile."""
+  update_users_me(data: update_directus_users_input!): directus_users
+
+  """Generate a TOTP secret for the current user."""
+  users_me_tfa_generate(password: String!): users_me_tfa_generate_data
+
+  """Enable TOTP for the current user."""
+  users_me_tfa_enable(otp: String!, secret: String!): Boolean
+
+  """Disable TOTP for the current user."""
+  users_me_tfa_disable(otp: String!): Boolean
+
+  # ---- Users ----
+  create_users_items(data: [create_directus_users_input!]!): [directus_users]
+  create_users_item(data: create_directus_users_input!): directus_users
+  update_users_items(
+    ids: [ID]!
+    data: update_directus_users_input!
+    filter: directus_users_filter
+    limit: Int
+    offset: Int
+    page: Int
+    search: String
+    sort: [String]
+  ): [directus_users]
+  update_users_item(id: ID!, data: update_directus_users_input!): directus_users
+  delete_users_items(ids: [ID]!): delete_many
+  delete_users_item(id: ID!): delete_one
+
+  """Invite a user to join the project."""
+  users_invite(email: String!, role: String!, invite_url: String): Boolean
+
+  # ---- Roles ----
+  create_roles_items(data: [create_directus_roles_input!]!): [directus_roles]
+  create_roles_item(data: create_directus_roles_input!): directus_roles
+  update_roles_items(
+    ids: [ID]!
+    data: update_directus_roles_input!
+    filter: directus_roles_filter
+    limit: Int
+    offset: Int
+    page: Int
+    search: String
+    sort: [String]
+  ): [directus_roles]
+  update_roles_item(id: ID!, data: update_directus_roles_input!): directus_roles
+  delete_roles_items(ids: [ID]!): delete_many
+  delete_roles_item(id: ID!): delete_one
+
+  # ---- Policies ----
+  create_policies_items(data: [create_directus_policies_input!]!): [directus_policies]
+  create_policies_item(data: create_directus_policies_input!): directus_policies
+  update_policies_items(
+    ids: [ID]!
+    data: update_directus_policies_input!
+    filter: directus_policies_filter
+    limit: Int
+    offset: Int
+    page: Int
+    search: String
+    sort: [String]
+  ): [directus_policies]
+  update_policies_item(id: ID!, data: update_directus_policies_input!): directus_policies
+  delete_policies_items(ids: [ID]!): delete_many
+  delete_policies_item(id: ID!): delete_one
+
+  # ---- Permissions ----
+  create_permissions_items(data: [create_directus_permissions_input!]!): [directus_permissions]
+  create_permissions_item(data: create_directus_permissions_input!): directus_permissions
+  update_permissions_items(
+    ids: [ID]!
+    data: update_directus_permissions_input!
+    filter: directus_permissions_filter
+    limit: Int
+    offset: Int
+    page: Int
+    search: String
+    sort: [String]
+  ): [directus_permissions]
+  update_permissions_item(id: ID!, data: update_directus_permissions_input!): directus_permissions
+  delete_permissions_items(ids: [ID]!): delete_many
+  delete_permissions_item(id: ID!): delete_one
+
+  # ---- Files ----
+  """Import a file from a remote URL."""
+  import_file(url: String!, data: create_directus_files_input): directus_files
+  create_files_items(data: [create_directus_files_input!]!): [directus_files]
+  create_files_item(data: create_directus_files_input!): directus_files
+  update_files_items(
+    ids: [ID]!
+    data: update_directus_files_input!
+    filter: directus_files_filter
+    limit: Int
+    offset: Int
+    page: Int
+    search: String
+    sort: [String]
+  ): [directus_files]
+  update_files_item(id: ID!, data: update_directus_files_input!): directus_files
+  delete_files_items(ids: [ID]!): delete_many
+  delete_files_item(id: ID!): delete_one
+
+  # ---- Folders ----
+  create_folders_items(data: [create_directus_folders_input!]!): [directus_folders]
+  create_folders_item(data: create_directus_folders_input!): directus_folders
+  update_folders_items(
+    ids: [ID]!
+    data: update_directus_folders_input!
+    filter: directus_folders_filter
+    limit: Int
+    offset: Int
+    page: Int
+    search: String
+    sort: [String]
+  ): [directus_folders]
+  update_folders_item(id: ID!, data: update_directus_folders_input!): directus_folders
+  delete_folders_items(ids: [ID]!): delete_many
+  delete_folders_item(id: ID!): delete_one
+
+  # ---- Activity ----
+  create_activity_item(data: JSON!): directus_activity
+
+  # ---- Presets ----
+  create_presets_items(data: [create_directus_presets_input!]!): [directus_presets]
+  create_presets_item(data: create_directus_presets_input!): directus_presets
+  update_presets_items(
+    ids: [ID]!
+    data: update_directus_presets_input!
+    filter: directus_presets_filter
+    limit: Int
+    offset: Int
+    page: Int
+    search: String
+    sort: [String]
+  ): [directus_presets]
+  update_presets_item(id: ID!, data: update_directus_presets_input!): directus_presets
+  delete_presets_items(ids: [ID]!): delete_many
+  delete_presets_item(id: ID!): delete_one
+
+  # ---- Translations ----
+  create_translations_items(data: [create_directus_translations_input!]!): [directus_translations]
+  create_translations_item(data: create_directus_translations_input!): directus_translations
+  update_translations_items(
+    ids: [ID]!
+    data: update_directus_translations_input!
+    filter: directus_translations_filter
+    limit: Int
+    offset: Int
+    page: Int
+    search: String
+    sort: [String]
+  ): [directus_translations]
+  update_translations_item(id: ID!, data: update_directus_translations_input!): directus_translations
+  delete_translations_items(ids: [ID]!): delete_many
+  delete_translations_item(id: ID!): delete_one
+
+  # ---- Dashboards ----
+  create_dashboards_items(data: [create_directus_dashboards_input!]!): [directus_dashboards]
+  create_dashboards_item(data: create_directus_dashboards_input!): directus_dashboards
+  update_dashboards_items(
+    ids: [ID]!
+    data: update_directus_dashboards_input!
+    filter: directus_dashboards_filter
+    limit: Int
+    offset: Int
+    page: Int
+    search: String
+    sort: [String]
+  ): [directus_dashboards]
+  update_dashboards_item(id: ID!, data: update_directus_dashboards_input!): directus_dashboards
+  delete_dashboards_items(ids: [ID]!): delete_many
+  delete_dashboards_item(id: ID!): delete_one
+
+  # ---- Panels ----
+  create_panels_items(data: [create_directus_panels_input!]!): [directus_panels]
+  create_panels_item(data: create_directus_panels_input!): directus_panels
+  update_panels_items(
+    ids: [ID]!
+    data: update_directus_panels_input!
+    filter: directus_panels_filter
+    limit: Int
+    offset: Int
+    page: Int
+    search: String
+    sort: [String]
+  ): [directus_panels]
+  update_panels_item(id: ID!, data: update_directus_panels_input!): directus_panels
+  delete_panels_items(ids: [ID]!): delete_many
+  delete_panels_item(id: ID!): delete_one
+
+  # ---- Notifications ----
+  create_notifications_items(data: [create_directus_notifications_input!]!): [directus_notifications]
+  create_notifications_item(data: create_directus_notifications_input!): directus_notifications
+  update_notifications_items(
+    ids: [ID]!
+    data: update_directus_notifications_input!
+    filter: directus_notifications_filter
+    limit: Int
+    offset: Int
+    page: Int
+    search: String
+    sort: [String]
+  ): [directus_notifications]
+  update_notifications_item(id: ID!, data: update_directus_notifications_input!): directus_notifications
+  delete_notifications_items(ids: [ID]!): delete_many
+  delete_notifications_item(id: ID!): delete_one
+
+  # ---- Flows ----
+  create_flows_items(data: [create_directus_flows_input!]!): [directus_flows]
+  create_flows_item(data: create_directus_flows_input!): directus_flows
+  update_flows_items(
+    ids: [ID]!
+    data: update_directus_flows_input!
+    filter: directus_flows_filter
+    limit: Int
+    offset: Int
+    page: Int
+    search: String
+    sort: [String]
+  ): [directus_flows]
+  update_flows_item(id: ID!, data: update_directus_flows_input!): directus_flows
+  delete_flows_items(ids: [ID]!): delete_many
+  delete_flows_item(id: ID!): delete_one
+
+  # ---- Operations ----
+  create_operations_items(data: [create_directus_operations_input!]!): [directus_operations]
+  create_operations_item(data: create_directus_operations_input!): directus_operations
+  update_operations_items(
+    ids: [ID]!
+    data: update_directus_operations_input!
+    filter: directus_operations_filter
+    limit: Int
+    offset: Int
+    page: Int
+    search: String
+    sort: [String]
+  ): [directus_operations]
+  update_operations_item(id: ID!, data: update_directus_operations_input!): directus_operations
+  delete_operations_items(ids: [ID]!): delete_many
+  delete_operations_item(id: ID!): delete_one
+
+  # ---- Shares ----
+  create_shares_items(data: [create_directus_shares_input!]!): [directus_shares]
+  create_shares_item(data: create_directus_shares_input!): directus_shares
+  update_shares_items(
+    ids: [ID]!
+    data: update_directus_shares_input!
+    filter: directus_shares_filter
+    limit: Int
+    offset: Int
+    page: Int
+    search: String
+    sort: [String]
+  ): [directus_shares]
+  update_shares_item(id: ID!, data: update_directus_shares_input!): directus_shares
+  delete_shares_items(ids: [ID]!): delete_many
+  delete_shares_item(id: ID!): delete_one
+
+  # ---- Versions ----
+  create_versions_items(data: [create_directus_versions_input!]!): [directus_versions]
+  create_versions_item(data: create_directus_versions_input!): directus_versions
+  update_versions_items(
+    ids: [ID]!
+    data: update_directus_versions_input!
+    filter: directus_versions_filter
+    limit: Int
+    offset: Int
+    page: Int
+    search: String
+    sort: [String]
+  ): [directus_versions]
+  update_versions_item(id: ID!, data: update_directus_versions_input!): directus_versions
+  delete_versions_items(ids: [ID]!): delete_many
+  delete_versions_item(id: ID!): delete_one
+
+  # ---- Schema management (admin only) ----
+  """Create a new collection (admin only)."""
+  create_collections_item(
+    data: create_collections_input!
+    concurrentIndexCreation: Boolean = false
+  ): directus_collections
+
+  """Update a collection's metadata (admin only)."""
+  update_collections_item(
+    collection: String!
+    data: update_collections_input!
+  ): directus_collections
+
+  """Delete a collection (admin only)."""
+  delete_collections_item(collection: String!): delete_collection
+
+  """Create a new field on a collection (admin only)."""
+  create_fields_item(
+    collection: String!
+    data: create_fields_input!
+    concurrentIndexCreation: Boolean = false
+  ): directus_fields
+
+  """Update a field (admin only)."""
+  update_fields_item(
+    collection: String!
+    field: String!
+    data: update_fields_input!
+    concurrentIndexCreation: Boolean = false
+  ): directus_fields
+
+  """Batch-update fields (admin only)."""
+  update_fields_items(
+    collection: String!
+    data: [update_fields_input!]!
+    concurrentIndexCreation: Boolean = false
+  ): directus_fields
+
+  """Delete a field (admin only)."""
+  delete_fields_item(collection: String!, field: String!): delete_field
+
+  """Create a new relation (admin only)."""
+  create_relations_item(data: create_relations_input!): directus_relations
+
+  """Update a relation (admin only)."""
+  update_relations_item(
+    collection: String!
+    field: String!
+    data: update_relations_input!
+  ): directus_relations
+
+  """Delete a relation (admin only)."""
+  delete_relations_item(collection: String!, field: String!): delete_relation
+
+  """Toggle an extension on or off (admin only)."""
+  update_extensions_item(bundle: String, name: String!, data: JSON!): directus_extensions
+
+  # ---- Utility mutations ----
+  """Generate a random string."""
+  utils_random_string(length: Int): String
+
+  """Hash a plain-text string."""
+  utils_hash_generate(string: String!): String
+
+  """Verify a string against a hash."""
+  utils_hash_verify(string: String!, hash: String!): Boolean
+
+  """Re-sort items in a collection using drag-and-drop order."""
+  utils_sort(collection: String!, item: ID!, to: ID!): Boolean
+
+  """Clear the Directus system cache."""
+  utils_cache_clear: Void
+
+  """Trigger a manual flow."""
+  utils_revert(revision: ID!): Boolean
+}
+
+# ---------------------------------------------------------------------------
+# Subscription type (WebSocket, /graphql)
+# ---------------------------------------------------------------------------
+
+"""
+Subscriptions are available via WebSocket when WEBSOCKETS_GRAPHQL_ENABLED=true.
+The collection name and event enum shown here are examples of the pattern;
+every readable collection gets its own subscription field.
+"""
+type Subscription {
+  """Subscribe to create/update/delete events on any system collection."""
+  directus_users_mutated(event: EventEnum): directus_users_mutated
+
+  directus_files_mutated(event: EventEnum): directus_files_mutated
+
+  directus_folders_mutated(event: EventEnum): directus_folders_mutated
+
+  directus_roles_mutated(event: EventEnum): directus_roles_mutated
+
+  directus_policies_mutated(event: EventEnum): directus_policies_mutated
+
+  directus_permissions_mutated(event: EventEnum): directus_permissions_mutated
+
+  directus_activity_mutated(event: EventEnum): directus_activity_mutated
+
+  directus_revisions_mutated(event: EventEnum): directus_revisions_mutated
+
+  directus_presets_mutated(event: EventEnum): directus_presets_mutated
+
+  directus_translations_mutated(event: EventEnum): directus_translations_mutated
+
+  directus_dashboards_mutated(event: EventEnum): directus_dashboards_mutated
+
+  directus_panels_mutated(event: EventEnum): directus_panels_mutated
+
+  directus_notifications_mutated(event: EventEnum): directus_notifications_mutated
+
+  directus_flows_mutated(event: EventEnum): directus_flows_mutated
+
+  directus_operations_mutated(event: EventEnum): directus_operations_mutated
+
+  directus_shares_mutated(event: EventEnum): directus_shares_mutated
+
+  directus_versions_mutated(event: EventEnum): directus_versions_mutated
+}
+
+# Subscription payload wrappers
+type directus_users_mutated       { event: EventEnum  data: directus_users }
+type directus_files_mutated       { event: EventEnum  data: directus_files }
+type directus_folders_mutated     { event: EventEnum  data: directus_folders }
+type directus_roles_mutated       { event: EventEnum  data: directus_roles }
+type directus_policies_mutated    { event: EventEnum  data: directus_policies }
+type directus_permissions_mutated { event: EventEnum  data: directus_permissions }
+type directus_activity_mutated    { event: EventEnum  data: directus_activity }
+type directus_revisions_mutated   { event: EventEnum  data: directus_revisions }
+type directus_presets_mutated     { event: EventEnum  data: directus_presets }
+type directus_translations_mutated{ event: EventEnum  data: directus_translations }
+type directus_dashboards_mutated  { event: EventEnum  data: directus_dashboards }
+type directus_panels_mutated      { event: EventEnum  data: directus_panels }
+type directus_notifications_mutated { event: EventEnum  data: directus_notifications }
+type directus_flows_mutated       { event: EventEnum  data: directus_flows }
+type directus_operations_mutated  { event: EventEnum  data: directus_operations }
+type directus_shares_mutated      { event: EventEnum  data: directus_shares }
+type directus_versions_mutated    { event: EventEnum  data: directus_versions }
+
+# ---------------------------------------------------------------------------
+# Aggregated result types (one per system collection)
+# ---------------------------------------------------------------------------
+
+type directus_users_aggregated       { group: JSON  countAll: Int  count: directus_users_aggregated_count  avg: directus_users_aggregated_fields  sum: directus_users_aggregated_fields  min: directus_users_aggregated_fields  max: directus_users_aggregated_fields }
+type directus_users_aggregated_count { id: Int }
+type directus_users_aggregated_fields { id: Float }
+
+type directus_files_aggregated       { group: JSON  countAll: Int  count: directus_files_aggregated_count  avg: directus_files_aggregated_fields  sum: directus_files_aggregated_fields  min: directus_files_aggregated_fields  max: directus_files_aggregated_fields }
+type directus_files_aggregated_count { id: Int  filesize: Int  width: Int  height: Int  duration: Int }
+type directus_files_aggregated_fields { filesize: Float  width: Float  height: Float  duration: Float }
+
+type directus_folders_aggregated       { group: JSON  countAll: Int  count: directus_folders_aggregated_count }
+type directus_folders_aggregated_count { id: Int  name: Int }
+
+type directus_roles_aggregated       { group: JSON  countAll: Int  count: directus_roles_aggregated_count }
+type directus_roles_aggregated_count { id: Int  name: Int }
+
+type directus_policies_aggregated       { group: JSON  countAll: Int  count: directus_policies_aggregated_count }
+type directus_policies_aggregated_count { id: Int  name: Int }
+
+type directus_access_aggregated       { group: JSON  countAll: Int  count: directus_access_aggregated_count  avg: directus_access_aggregated_fields  sum: directus_access_aggregated_fields  min: directus_access_aggregated_fields  max: directus_access_aggregated_fields }
+type directus_access_aggregated_count { id: Int  sort: Int }
+type directus_access_aggregated_fields { sort: Float }
+
+type directus_permissions_aggregated       { group: JSON  countAll: Int  count: directus_permissions_aggregated_count }
+type directus_permissions_aggregated_count { id: Int  collection: Int  action: Int }
+
+type directus_activity_aggregated       { group: JSON  countAll: Int  count: directus_activity_aggregated_count }
+type directus_activity_aggregated_count { id: Int  action: Int  collection: Int  item: Int }
+
+type directus_revisions_aggregated       { group: JSON  countAll: Int  count: directus_revisions_aggregated_count }
+type directus_revisions_aggregated_count { id: Int  collection: Int  item: Int }
+
+type directus_presets_aggregated       { group: JSON  countAll: Int  count: directus_presets_aggregated_count  avg: directus_presets_aggregated_fields  sum: directus_presets_aggregated_fields  min: directus_presets_aggregated_fields  max: directus_presets_aggregated_fields }
+type directus_presets_aggregated_count { id: Int  refresh_interval: Int }
+type directus_presets_aggregated_fields { id: Float  refresh_interval: Float }
+
+type directus_translations_aggregated       { group: JSON  countAll: Int  count: directus_translations_aggregated_count }
+type directus_translations_aggregated_count { id: Int  language: Int  key: Int  value: Int }
+
+type directus_dashboards_aggregated       { group: JSON  countAll: Int  count: directus_dashboards_aggregated_count }
+type directus_dashboards_aggregated_count { id: Int  name: Int }
+
+type directus_panels_aggregated       { group: JSON  countAll: Int  count: directus_panels_aggregated_count  avg: directus_panels_aggregated_fields  sum: directus_panels_aggregated_fields  min: directus_panels_aggregated_fields  max: directus_panels_aggregated_fields }
+type directus_panels_aggregated_count { id: Int  position_x: Int  position_y: Int  width: Int  height: Int }
+type directus_panels_aggregated_fields { position_x: Float  position_y: Float  width: Float  height: Float }
+
+type directus_notifications_aggregated       { group: JSON  countAll: Int  count: directus_notifications_aggregated_count }
+type directus_notifications_aggregated_count { id: Int  subject: Int }
+
+type directus_flows_aggregated       { group: JSON  countAll: Int  count: directus_flows_aggregated_count }
+type directus_flows_aggregated_count { id: Int  name: Int }
+
+type directus_operations_aggregated       { group: JSON  countAll: Int  count: directus_operations_aggregated_count  avg: directus_operations_aggregated_fields  sum: directus_operations_aggregated_fields  min: directus_operations_aggregated_fields  max: directus_operations_aggregated_fields }
+type directus_operations_aggregated_count { id: Int  key: Int  type: Int  position_x: Int  position_y: Int }
+type directus_operations_aggregated_fields { position_x: Float  position_y: Float }
+
+type directus_shares_aggregated       { group: JSON  countAll: Int  count: directus_shares_aggregated_count  avg: directus_shares_aggregated_fields  sum: directus_shares_aggregated_fields  min: directus_shares_aggregated_fields  max: directus_shares_aggregated_fields }
+type directus_shares_aggregated_count { id: Int  times_used: Int  max_uses: Int }
+type directus_shares_aggregated_fields { times_used: Float  max_uses: Float }
+
+type directus_versions_aggregated       { group: JSON  countAll: Int  count: directus_versions_aggregated_count }
+type directus_versions_aggregated_count { id: Int  key: Int  collection: Int }
+
+# ---------------------------------------------------------------------------
+# Filter input types (one per system collection)
+# Relational fields use the related collection's filter type.
+# All collections also support _and / _or logical operators.
+# ---------------------------------------------------------------------------
+
+input directus_users_filter {
+  id: id_filter_operators
+  first_name: string_filter_operators
+  last_name: string_filter_operators
+  email: string_filter_operators
+  location: string_filter_operators
+  title: string_filter_operators
+  description: string_filter_operators
+  tags: json_filter_operators
+  language: string_filter_operators
+  status: string_filter_operators
+  last_access: date_filter_operators
+  last_page: string_filter_operators
+  provider: string_filter_operators
+  external_identifier: string_filter_operators
+  email_notifications: boolean_filter_operators
+  appearance: string_filter_operators
+  theme_dark: string_filter_operators
+  theme_light: string_filter_operators
+  _and: [directus_users_filter]
+  _or: [directus_users_filter]
+}
+
+input directus_files_filter {
+  id: id_filter_operators
+  storage: string_filter_operators
+  filename_disk: string_filter_operators
+  filename_download: string_filter_operators
+  title: string_filter_operators
+  type: string_filter_operators
+  folder: directus_folders_filter
+  uploaded_by: directus_users_filter
+  charset: string_filter_operators
+  filesize: big_int_filter_operators
+  width: number_filter_operators
+  height: number_filter_operators
+  duration: number_filter_operators
+  embed: string_filter_operators
+  description: string_filter_operators
+  location: string_filter_operators
+  tags: json_filter_operators
+  metadata: json_filter_operators
+  focal_point_x: number_filter_operators
+  focal_point_y: number_filter_operators
+  uploaded_on: date_filter_operators
+  modified_on: date_filter_operators
+  created_on: date_filter_operators
+  _and: [directus_files_filter]
+  _or: [directus_files_filter]
+}
+
+input directus_folders_filter {
+  id: id_filter_operators
+  name: string_filter_operators
+  parent: directus_folders_filter
+  _and: [directus_folders_filter]
+  _or: [directus_folders_filter]
+}
+
+input directus_roles_filter {
+  id: id_filter_operators
+  name: string_filter_operators
+  icon: string_filter_operators
+  description: string_filter_operators
+  parent: directus_roles_filter
+  _and: [directus_roles_filter]
+  _or: [directus_roles_filter]
+}
+
+input directus_policies_filter {
+  id: id_filter_operators
+  name: string_filter_operators
+  icon: string_filter_operators
+  description: string_filter_operators
+  enforce_tfa: boolean_filter_operators
+  admin_access: boolean_filter_operators
+  app_access: boolean_filter_operators
+  _and: [directus_policies_filter]
+  _or: [directus_policies_filter]
+}
+
+input directus_access_filter {
+  id: id_filter_operators
+  role: directus_roles_filter
+  user: directus_users_filter
+  policy: directus_policies_filter
+  sort: number_filter_operators
+  _and: [directus_access_filter]
+  _or: [directus_access_filter]
+}
+
+input directus_permissions_filter {
+  id: id_filter_operators
+  collection: string_filter_operators
+  action: string_filter_operators
+  policy: directus_policies_filter
+  _and: [directus_permissions_filter]
+  _or: [directus_permissions_filter]
+}
+
+input directus_activity_filter {
+  id: id_filter_operators
+  action: string_filter_operators
+  user: directus_users_filter
+  timestamp: date_filter_operators
+  ip: string_filter_operators
+  collection: string_filter_operators
+  item: string_filter_operators
+  _and: [directus_activity_filter]
+  _or: [directus_activity_filter]
+}
+
+input directus_revisions_filter {
+  id: id_filter_operators
+  activity: directus_activity_filter
+  collection: string_filter_operators
+  item: string_filter_operators
+  _and: [directus_revisions_filter]
+  _or: [directus_revisions_filter]
+}
+
+input directus_presets_filter {
+  id: id_filter_operators
+  bookmark: string_filter_operators
+  user: directus_users_filter
+  role: directus_roles_filter
+  collection: string_filter_operators
+  search: string_filter_operators
+  layout: string_filter_operators
+  refresh_interval: number_filter_operators
+  icon: string_filter_operators
+  color: string_filter_operators
+  _and: [directus_presets_filter]
+  _or: [directus_presets_filter]
+}
+
+input directus_translations_filter {
+  id: id_filter_operators
+  language: string_filter_operators
+  key: string_filter_operators
+  value: string_filter_operators
+  _and: [directus_translations_filter]
+  _or: [directus_translations_filter]
+}
+
+input directus_dashboards_filter {
+  id: id_filter_operators
+  name: string_filter_operators
+  icon: string_filter_operators
+  note: string_filter_operators
+  date_created: date_filter_operators
+  user_created: directus_users_filter
+  color: string_filter_operators
+  _and: [directus_dashboards_filter]
+  _or: [directus_dashboards_filter]
+}
+
+input directus_panels_filter {
+  id: id_filter_operators
+  dashboard: directus_dashboards_filter
+  name: string_filter_operators
+  icon: string_filter_operators
+  color: string_filter_operators
+  show_header: boolean_filter_operators
+  note: string_filter_operators
+  type: string_filter_operators
+  position_x: number_filter_operators
+  position_y: number_filter_operators
+  width: number_filter_operators
+  height: number_filter_operators
+  date_created: date_filter_operators
+  user_created: directus_users_filter
+  _and: [directus_panels_filter]
+  _or: [directus_panels_filter]
+}
+
+input directus_notifications_filter {
+  id: id_filter_operators
+  timestamp: date_filter_operators
+  status: string_filter_operators
+  recipient: directus_users_filter
+  sender: directus_users_filter
+  subject: string_filter_operators
+  collection: string_filter_operators
+  item: string_filter_operators
+  _and: [directus_notifications_filter]
+  _or: [directus_notifications_filter]
+}
+
+input directus_flows_filter {
+  id: id_filter_operators
+  name: string_filter_operators
+  icon: string_filter_operators
+  color: string_filter_operators
+  description: string_filter_operators
+  status: string_filter_operators
+  trigger: string_filter_operators
+  accountability: string_filter_operators
+  date_created: date_filter_operators
+  user_created: directus_users_filter
+  _and: [directus_flows_filter]
+  _or: [directus_flows_filter]
+}
+
+input directus_operations_filter {
+  id: id_filter_operators
+  name: string_filter_operators
+  key: string_filter_operators
+  type: string_filter_operators
+  position_x: number_filter_operators
+  position_y: number_filter_operators
+  flow: directus_flows_filter
+  date_created: date_filter_operators
+  user_created: directus_users_filter
+  _and: [directus_operations_filter]
+  _or: [directus_operations_filter]
+}
+
+input directus_shares_filter {
+  id: id_filter_operators
+  name: string_filter_operators
+  collection: string_filter_operators
+  item: string_filter_operators
+  role: directus_roles_filter
+  user_created: directus_users_filter
+  date_created: date_filter_operators
+  date_start: date_filter_operators
+  date_end: date_filter_operators
+  times_used: number_filter_operators
+  max_uses: number_filter_operators
+  _and: [directus_shares_filter]
+  _or: [directus_shares_filter]
+}
+
+input directus_versions_filter {
+  id: id_filter_operators
+  key: string_filter_operators
+  name: string_filter_operators
+  collection: string_filter_operators
+  item: string_filter_operators
+  hash: string_filter_operators
+  date_created: date_filter_operators
+  date_updated: date_filter_operators
+  user_created: directus_users_filter
+  user_updated: directus_users_filter
+  _and: [directus_versions_filter]
+  _or: [directus_versions_filter]
+}
