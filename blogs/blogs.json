@@ -1,0 +1,21 @@
+{
+  "repo": "directus",
+  "feeds": [
+    {
+      "source": "https://directus.com/rss.xml",
+      "feed_url": "https://directus.com/rss.xml",
+      "title": "",
+      "saved": 0,
+      "method": "feed"
+    },
+    {
+      "source": "https://github.com/directus/directus",
+      "feed_url": "https://github.com/directus/directus",
+      "title": "",
+      "saved": 0,
+      "method": "none"
+    }
+  ],
+  "fetched": "2026-06-27T12:03:07Z",
+  "post_count": 20
+}
