@@ -79,6 +79,8 @@ apis:
   - type: GraphQLSchema
     url: graphql/directus-schema.graphql
 common:
+- type: DomainSecurity
+  url: security/directus-domain-security.yml
 - type: Website
   url: https://directus.com/
 - type: Documentation
