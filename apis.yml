@@ -90,6 +90,14 @@ apis:
   - type: GraphQLSchema
     url: graphql/directus-schema.graphql
 common:
+- type: IssueTracker
+  url: https://github.com/directus/directus/issues
+- type: Releases
+  url: https://github.com/directus/directus/releases
+- type: CodeOfConduct
+  url: https://github.com/directus/directus/blob/main/code_of_conduct.md
+- type: ContributionGuide
+  url: https://github.com/directus/directus/blob/main/contributing.md
 - type: DomainSecurity
   url: security/directus-domain-security.yml
 - type: Website
