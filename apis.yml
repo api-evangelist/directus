@@ -35,6 +35,17 @@ tags:
 - REST API
 - Headless CMS
 - Data Platform
+- Open-Source
+- SQL Database
+- No-Code
+- Content Management
+- Real-Time
+- MCP
+tags_raw:
+- GraphQL
+- REST API
+- Headless CMS
+- Data Platform
 - Open Source
 - SQL Database
 - No-Code
@@ -54,6 +65,12 @@ apis:
   image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/apis-json-logo.jpg
   humanURL: https://directus.com/docs/api
   tags:
+  - REST
+  - CRUD
+  - Collection
+  - Authentication
+  - File
+  tags_raw:
   - REST
   - CRUD
   - Collections
@@ -77,6 +94,12 @@ apis:
   image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/apis-json-logo.jpg
   humanURL: https://directus.com/docs/graphql
   tags:
+  - GraphQL
+  - Query
+  - Mutations
+  - Subscription
+  - Real-Time
+  tags_raw:
   - GraphQL
   - Queries
   - Mutations
