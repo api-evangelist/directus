@@ -12,6 +12,18 @@ description: >-
   real-time WebSockets, and an MCP server for AI agent integration.
   Deployable as a self-hosted open-source project or as Directus Cloud.
 url: https://raw.githubusercontent.com/api-evangelist/directus/refs/heads/main/apis.yml
+deliveryModel:
+  model: unknown
+  open_source: unknown
+  commercial: true
+  callable_host: false
+  label: Delivery model not determined — needs a product licence on record
+  confidence: low
+  source:
+  - pricing
+  - repository-unlicensed
+  generated: '2026-08-28'
+  method: derived
 accessModel:
   pricing: unknown
   onboarding: unknown
