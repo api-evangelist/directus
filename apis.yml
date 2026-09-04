@@ -38,7 +38,7 @@ accessModel:
 image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/icons/directus.png
 type: Index
 access: Open Source
-position: Consumer
+position: Consuming
 created: '2026-06-14'
 modified: '2026-06-14'
 specificationVersion: '0.23'
