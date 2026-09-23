@@ -1,0 +1,31 @@
+# Front Door AI Index — directus — 2026-09-17
+# AI vocabulary counted on the provider's root page. Generated; do not edit.
+# `score` is null unless ownership is `own` — see front_door_ai.py.
+front_door_ai:
+  slug: directus
+  lexicon_version: '1.0'
+  probed_at: '2026-09-17'
+  host: directus.com
+  final_host: directus.com
+  ownership: own
+  owner: directus
+  shares_host_with: null
+  inherited_from: null
+  verdict: scored
+  score: 43
+  host_score: 43
+  density: 12.05
+  words: 3568
+  tiers:
+    agentic: 15
+    core: 19
+    model: 9
+  ambiguous: 7
+  top_terms:
+    AI: 19
+    MCP: 12
+    Claude: 6
+    smart: 4
+    AI assistant: 3
+    ChatGPT: 3
+    agent: 3
