@@ -14,6 +14,10 @@ description: >-
 url: https://raw.githubusercontent.com/api-evangelist/directus/refs/heads/main/apis.yml
 deliveryModel:
   model: unknown
+  license_evidence:
+    repo: directus/directus
+    spdx: NOASSERTION
+    stars: 37966
   open_source: unknown
   commercial: true
   callable_host: false
@@ -22,7 +26,7 @@ deliveryModel:
   source:
   - pricing
   - repository-unlicensed
-  generated: '2026-08-28'
+  generated: '2026-09-25'
   method: derived
 accessModel:
   pricing: unknown
@@ -47,7 +51,7 @@ tags:
 - REST API
 - Headless CMS
 - Data Platform
-- Open-Source
+- Open Source
 - SQL Database
 - No-Code
 - Content Management
@@ -64,6 +68,7 @@ tags_raw:
 - Content Management
 - Real-Time
 - MCP
+- Open-Source
 apis:
 - aid: directus:rest-api
   name: Directus REST API
