@@ -64,56 +64,96 @@
 > Full detail: **[Where this data comes from](https://apievangelist.com/about/where-our-data-comes-from)**
 <!-- API-EVANGELIST-PROVENANCE:END -->
 
-Directus is an open-source data platform that wraps any SQL database with a REST and GraphQL API, auto-generated from the schema, plus a no-code admin app for data management. It supports PostgreSQL, MySQL, SQLite, MS SQL, OracleDB, and CockroachDB, and can be deployed as a self-hosted open-source project or via Directus Cloud.
+Open-source data platform that wraps any SQL database with a REST and GraphQL API, auto-generated from the schema, plus a no-code admin app for data management. Directus turns any new or existing SQL database (PostgreSQL, MySQL, SQLite, MS SQL, OracleDB, CockroachDB) into an instant REST and GraphQL API with a visual Data Studio for non-technical users. The platform includes policy-based access control, an automation engine (Flows), a built-in AI assistant, digital asset management, real-time WebSockets, and an MCP server for AI agent integration. Deployable as a self-hosted open-source project or as Directus Cloud.
 
-## Links
+**Areas:** GraphQL · REST API · Headless CMS · Data Platform · Open Source · SQL Database · No-Code · Content Management · Real-Time · MCP
 
-- **Website:** https://directus.com/
-- **Documentation:** https://directus.com/docs
-- **API Reference:** https://directus.com/docs/api
-- **GraphQL Docs:** https://directus.com/docs/graphql
-- **Pricing:** https://directus.com/pricing
-- **GitHub Organization:** https://github.com/directus
-- **GitHub Repository:** https://github.com/directus/directus
-- **LinkedIn:** https://www.linkedin.com/company/directus-io
-- **Blog:** https://directus.com/blog
-- **Community Forum:** https://community.directus.io
-- **Discord:** https://discord.com/invite/directus
-- **Live Sandbox:** https://sandbox.directus.io
+## Directus on APIs.io
 
-## About
+Everything profiled for Directus is published on APIs.io rather than in this repository. Start at the provider page — **[apis.io/providers/directus/](https://apis.io/providers/directus/)** — or go straight to one of the APIs or properties below.
 
-Directus provides an instant REST and GraphQL API layer on top of any SQL database without altering the underlying schema. Key platform capabilities include:
+### APIs (2)
 
-- **REST and GraphQL APIs:** Auto-generated, schema-driven APIs with full CRUD, filtering, sorting, pagination, and nested relational queries.
-- **Visual Data Studio:** No-code interface for non-technical users to manage database content.
-- **Policy-Based Access Control:** Granular RBAC with role-based and attribute-based policies.
-- **Automation Engine (Flows):** Visual low-code workflow builder for event-driven automation.
-- **Built-in AI Assistant:** Integrated AI capabilities including translations and data insights.
-- **Digital Asset Management:** File upload, storage, and transformation pipeline.
-- **Real-Time and WebSockets:** Live data subscriptions via WebSocket connections.
-- **MCP Server:** Model Context Protocol server for integration with AI agents (Claude, ChatGPT, Cursor).
-- **Extensibility:** Custom extensions for endpoints, hooks, interfaces, displays, panels, and modules.
+- [Directus REST API](https://apis.io/apis/directus/rest-api/) — Auto-generated REST API built on top of any SQL database schema. Provides full CRUD operations on all collections, authentication endpoints, file…
+- [Directus GraphQL API](https://apis.io/apis/directus/graphql-api/) — Auto-generated GraphQL API that mirrors the REST API surface, providing strongly-typed queries and mutations for all collections and system endpoints.…
 
-## Repository Structure
+### Published properties
 
-```
-directus/
-├── apis.yml                          # APIs.json catalog entry
-├── README.md                         # This file
-├── graphql/
-│   └── directus-graphql.md           # GraphQL API documentation
-├── plans/
-│   └── directus-plans.md             # Pricing plan details
-├── rate-limits/
-│   └── directus-rate-limits.md       # Rate limiting information
-└── finops/
-    └── directus-finops.md            # Cost structure and optimization
-```
+Each property below is a page on APIs.io carrying the machine-readable artifact and what it says.
 
-## APIs
+#### GraphQL (1)
 
-| API | Type | Description |
-|-----|------|-------------|
-| Directus REST API | REST | Auto-generated CRUD API over any SQL database |
-| Directus GraphQL API | GraphQL | Schema-driven GraphQL with queries, mutations, and subscriptions |
+GraphQL schemas.
+
+- [Directus GraphQL API](https://apis.io/graphqls/directus/directus-graphql/)
+
+#### Security (1)
+
+Authentication, trust centre, and vulnerability disclosure.
+
+- [Directus Domain Security](https://apis.io/security/directus/directus-domain-security/)
+
+## Where to find this API
+
+Links to the company's own pages. This repository publishes no copy of their specifications — the canonical document is theirs and lives at the URLs below.
+
+- [Website](https://directus.com/)
+- [Documentation](https://directus.com/docs)
+- [Getting started](https://directus.com/docs/getting-started)
+- [API reference](https://directus.com/docs/api)
+- [Pricing](https://directus.com/pricing)
+- [Blog](https://directus.com/blog)
+- [GitHub](https://github.com/directus)
+
+## API Evangelist rating
+
+**Kin Score 23.7** — emerging · rubric 0.24.0 · scored 2026-10-17
+
+| Facet | Score |
+|---|---|
+| Discoverability | 57.1 |
+| Contract quality | 35.1 |
+| Contract governance | 0.0 |
+| Operational transparency | 18.4 |
+| Developer ergonomics | 26.2 |
+| Access clarity | 10.5 |
+
+**Agent readiness 18.0** — agent-aware
+
+| Agent-readiness dimension | Result |
+|---|---|
+| Spec Presence | yes |
+| Agentic Access | — |
+| Reversibility Documented | — |
+| MCP Server | — |
+| Auth Clarity | bearer (partial credit) |
+| Idempotency | — |
+| Error Semantics | — |
+| OpenAPI Examples | — |
+| Rate Limit Signal | documented (partial credit) |
+| Event Surface Described | — |
+| Agent Skills | — |
+| Well Known Catalog | — |
+| Consent Identity | — |
+| Agent Card | — |
+| Dry Run Mode | — |
+| Delegated Identity | — |
+| Protected Resource Metadata | — |
+| Dynamic Client Registration | — |
+| Agentic Commerce | — |
+
+**Regulatory alignment 11.8** — Horizontal (data, software, accessibility, platform)
+
+The rubric is published at [github.com/api-evangelist/kin-score](https://github.com/api-evangelist/kin-score). The per-check breakdown behind these numbers — which checks were earned, partial or missed — along with score history and how this provider compares to its peers, is available at [apis.io/providers/directus/](https://apis.io/providers/directus/).
+
+## How this profile is made
+
+API Evangelist profiles a company's public API surface the way a developer would find it: the website, developer portal and documentation, the specifications it publishes, its public repositories, and its pricing, status and changelog pages. From that it derives the properties above — contracts split per API, workflows, schemas, collections, governance rules, plans and rate limits — and scores them against the published [Kin Score rubric](https://github.com/api-evangelist/kin-score).
+
+The artifacts are published on [APIs.io](https://apis.io), not in this repository. This repository is the public record for Directus: the place to say something is wrong, missing or out of date, and to ask for a re-score or a removal.
+
+## Open an issue
+
+- **Something about this listing** — a wrong description, a missing API, a stale artifact or a question about the rating: [open an issue on this repository](https://github.com/api-evangelist/directus/issues/new).
+- **A new API, or one that is not in the catalog yet** — [submit it on APIs.io](https://apis.io/add/).
+- **Anything else** — [the APIs.io inbox](https://github.com/api-search/inbox/issues/new) or [info@apievangelist.com](mailto:info@apievangelist.com).
